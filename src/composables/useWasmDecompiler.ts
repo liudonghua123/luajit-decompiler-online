@@ -23,7 +23,7 @@ export function useWasmDecompiler() {
 
       // Create WASI instance
       wasi = new WASI({
-        args: [],
+        args: ['-'],
         env: {},
         bindings: {
           hrtime: () => BigInt(Date.now()) * BigInt(1000000),
@@ -88,7 +88,7 @@ export function useWasmDecompiler() {
       newWasmFs.fs.writeFileSync('/dev/stdin', new Uint8Array(buffer))
 
       const newWasi = new WASI({
-        args: [],
+        args: ['-'],
         env: {},
         bindings: {
           hrtime: () => BigInt(Date.now()) * BigInt(1000000),
