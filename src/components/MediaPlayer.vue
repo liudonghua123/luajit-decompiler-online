@@ -7,12 +7,14 @@ const props = defineProps<{
   fileName: string
 }>()
 
+const mediaRef = ref<HTMLMediaElement | null>(null)
 const isPlaying = ref(false)
 const currentTime = ref(0)
 const duration = ref(0)
 const volume = ref(1)
 const playbackRate = ref(1)
 const isLoaded = ref(false)
+const barHeights = ref<number[]>(Array.from({ length: 20 }, () => 20 + Math.random() * 40))
 
 const isAudio = computed(() => props.mimeType.startsWith('audio/'))
 const isVideo = computed(() => props.mimeType.startsWith('video/'))
@@ -23,13 +25,12 @@ const progress = computed(() => {
 })
 
 function togglePlay() {
-  const media = document.querySelector('audio, video') as HTMLMediaElement
-  if (!media) return
+  if (!mediaRef.value) return
 
   if (isPlaying.value) {
-    media.pause()
+    mediaRef.value.pause()
   } else {
-    media.play()
+    mediaRef.value.play()
   }
   isPlaying.value = !isPlaying.value
 }
@@ -45,30 +46,37 @@ function onLoadedMetadata(e: Event) {
   isLoaded.value = true
 }
 
-function seek(e: MouseEvent) {
-  const bar = e.currentTarget as HTMLElement
+function seek(e: MouseEvent | { type: string; direction?: 'left' | 'right' }) {
+  if (e.type === 'keydown') {
+    const direction = (e as KeyboardEvent).key === 'ArrowLeft' ? 'left' : 'right'
+    if (mediaRef.value) {
+      const delta = duration.value * 0.05 // 5% of duration
+      mediaRef.value.currentTime = direction === 'left'
+        ? Math.max(0, mediaRef.value.currentTime - delta)
+        : Math.min(duration.value, mediaRef.value.currentTime + delta)
+    }
+    return
+  }
+  const bar = (e as MouseEvent).currentTarget as HTMLElement
   const rect = bar.getBoundingClientRect()
-  const percent = (e.clientX - rect.left) / rect.width
-  const media = document.querySelector('audio, video') as HTMLMediaElement
-  if (media) {
-    media.currentTime = percent * duration.value
+  const percent = ((e as MouseEvent).clientX - rect.left) / rect.width
+  if (mediaRef.value) {
+    mediaRef.value.currentTime = percent * duration.value
   }
 }
 
 function changeVolume(e: Event) {
   const input = e.target as HTMLInputElement
   volume.value = parseFloat(input.value)
-  const media = document.querySelector('audio, video') as HTMLMediaElement
-  if (media) {
-    media.volume = volume.value
+  if (mediaRef.value) {
+    mediaRef.value.volume = volume.value
   }
 }
 
 function changeRate(rate: number) {
   playbackRate.value = rate
-  const media = document.querySelector('audio, video') as HTMLMediaElement
-  if (media) {
-    media.playbackRate = rate
+  if (mediaRef.value) {
+    mediaRef.value.playbackRate = rate
   }
 }
 
@@ -94,6 +102,7 @@ function formatTime(seconds: number): string {
     <div class="relative rounded-xl overflow-hidden bg-black/10 mb-4">
       <video
         v-if="isVideo"
+        ref="mediaRef"
         :src="url"
         class="w-full max-h-80 mx-auto"
         @timeupdate="onTimeUpdate"
@@ -103,6 +112,7 @@ function formatTime(seconds: number): string {
       />
       <audio
         v-if="isAudio"
+        ref="mediaRef"
         :src="url"
         class="w-full"
         @timeupdate="onTimeUpdate"
@@ -113,7 +123,7 @@ function formatTime(seconds: number): string {
 
       <!-- Audio Visualizer Placeholder -->
       <div v-if="isAudio && isLoaded" class="h-20 flex items-center justify-center gap-1">
-        <div v-for="i in 20" :key="i" class="w-1 bg-gradient-to-t from-purple-500 to-blue-500 rounded-full animate-pulse" :style="{ height: `${20 + Math.random() * 40}px`, animationDelay: `${i * 0.05}s` }"></div>
+        <div v-for="(height, i) in barHeights" :key="i" class="w-1 bg-gradient-to-t from-purple-500 to-blue-500 rounded-full animate-pulse" :style="{ height: `${height}px`, animationDelay: `${i * 0.05}s` }"></div>
       </div>
     </div>
 
@@ -127,8 +137,8 @@ function formatTime(seconds: number): string {
       aria-label="播放进度"
       tabindex="0"
       @click="seek"
-      @keydown.left="seek({ clientX: 0 } as MouseEvent); currentTime = Math.max(0, currentTime - 5)"
-      @keydown.right="seek({ clientX: 99999 } as MouseEvent); currentTime = Math.min(duration, currentTime + 5)"
+      @keydown.left="seek({ type: 'keydown', direction: 'left' } as any)"
+      @keydown.right="seek({ type: 'keydown', direction: 'right' } as any)"
     >
       <div
         class="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all"
