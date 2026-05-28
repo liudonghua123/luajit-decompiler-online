@@ -134,7 +134,7 @@ async function openFolder() {
     <!-- Main Content -->
     <main class="flex-1 flex overflow-hidden">
       <!-- Left Sidebar - File Tree -->
-      <aside v-if="hasProject" class="w-72 flex-shrink-0 flex flex-col">
+      <aside v-if="hasProject" class="w-56 sm:w-64 md:w-72 flex-shrink-0 flex flex-col max-lg:hidden">
         <FolderTree :tree="fileTree" :selected-path="selectedPath" @select="onSelect" />
       </aside>
 
