@@ -1,18 +1,22 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import monacoEditorPlugin from 'vite-plugin-monaco-editor'
 
-export default defineConfig({
-  build: {
-    sourcemap: true
-  },
-  plugins: [
-    vue(),
-    monacoEditorPlugin.default({
-      languageWorkers: ['editorWorkerService']
-    })
-  ],
-  optimizeDeps: {
-    exclude: ['@wasmer/sdk']
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  return {
+    base: env.VITE_BASE_URL || '/',
+    build: {
+      sourcemap: true
+    },
+    plugins: [
+      vue(),
+      monacoEditorPlugin.default({
+        languageWorkers: ['editorWorkerService']
+      })
+    ],
+    optimizeDeps: {
+      exclude: ['@wasmer/sdk']
+    }
   }
 })
