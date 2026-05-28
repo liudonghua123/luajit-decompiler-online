@@ -35,7 +35,7 @@ jobs:
         run: cp luajit-decompiler-v2-wasi.wasm public/
 
       - name: Build
-        run: npm run build:github
+        run: npx vite build --base /luajit-decompiler-online/
         env:
           NODE_ENV: production
 
