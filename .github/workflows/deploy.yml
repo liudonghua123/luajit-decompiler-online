@@ -35,10 +35,9 @@ jobs:
         run: cp luajit-decompiler-v2-wasi.wasm public/
 
       - name: Build
-        run: npm run build
+        run: npm run build:github
         env:
           NODE_ENV: production
-          VITE_BASE_URL: /luajit-decompiler-online
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

@@ -1,10 +1,10 @@
 import { ref } from 'vue'
 import type { DecompileResult } from '../types'
 import { init, runWasix, initializeLogger  } from '@wasmer/sdk'
-// import wasmerSDKModule from "@wasmer/sdk/wasm-inline";
-// import { getWasm } from "@wasmer/sdk/wasm-inline";
 import wasmUrl from "@wasmer/sdk/wasm?url";
 
+const BASE_URL = import.meta.env.BASE_URL || '/'
+const WASM_PATH = `${BASE_URL}luajit-decompiler-v2-wasi.wasm`
 
 export function useWasmDecompiler() {
   const isLoading = ref(false)
@@ -14,12 +14,10 @@ export function useWasmDecompiler() {
 
   async function getModule(): Promise<WebAssembly.Module> {
     if (!modulePromise) {
-      // await init({ module: getWasm() }); // This uses the inline wasmer SDK version
-      await init({ module: wasmUrl }); // This inits the SDK with a custom URL
-
+      await init({ module: wasmUrl })
       initializeLogger("debug")
       modulePromise = WebAssembly.compileStreaming(
-        fetch('/luajit-decompiler-v2-wasi.wasm')
+        fetch(WASM_PATH)
       )
     }
     return modulePromise
