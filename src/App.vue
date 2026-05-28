@@ -49,7 +49,7 @@ async function openFolder() {
     <!-- Toolbar -->
     <div class="flex items-center justify-between px-4 py-3 bg-gray-800 text-white">
       <div class="flex items-center gap-4">
-        <h1 class="text-lg font-semibold">LuaJIT Decompiler</h1>
+        <h1 class="text-lg font-semibold">LuaJIT Decompiler V2</h1>
         <span v-if="projectName" class="text-gray-400">| {{ projectName }}</span>
       </div>
       <div class="flex items-center gap-2">
