@@ -15,8 +15,10 @@ export function useWasmDecompiler() {
 
   async function getModule(): Promise<WebAssembly.Module> {
     if (!modulePromise) {
+      // TOFIX: the module url is https://liudonghua123.github.io/luajit-decompiler-online/luajit-decompiler-online/assets/wasmer_js_bg-CI_saUtm.wasm ?
       // the sdkUrl need to be full url, or you will got error like "Failed to resolve module specifier '/assets/index-DgoQWoIK.mjs'"
-      await init({ module: `${BASE_URL}${wasmUrl.replace(/^\//, '')}`, sdkUrl: new URL(`${BASE_URL}${sdkUrl.replace(/^\//, '')}`, window.location.origin).href })
+      // await init({ module: `${BASE_URL}${wasmUrl.replace(/^\//, '')}`, sdkUrl: new URL(`${BASE_URL}${sdkUrl.replace(/^\//, '')}`, window.location.origin).href })
+      await init({ module: wasmUrl, sdkUrl: new URL(sdkUrl, window.location.origin).href})
       initializeLogger("debug")
       modulePromise = WebAssembly.compileStreaming(
         fetch(WASM_PATH)
