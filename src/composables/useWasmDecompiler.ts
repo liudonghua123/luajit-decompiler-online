@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import type { DecompileResult } from '../types'
 import { init, runWasix, initializeLogger  } from '@wasmer/sdk'
 import wasmUrl from "@wasmer/sdk/wasm?url";
+import sdkUrl from "@wasmer/sdk?url";
 
 const BASE_URL = import.meta.env.BASE_URL || '/'
 const WASM_PATH = `${BASE_URL}luajit-decompiler-v2-wasi.wasm`
@@ -14,7 +15,8 @@ export function useWasmDecompiler() {
 
   async function getModule(): Promise<WebAssembly.Module> {
     if (!modulePromise) {
-      await init({ module: wasmUrl })
+      // the sdkUrl need to be full url, or you will got error like "Failed to resolve module specifier '/assets/index-DgoQWoIK.mjs'"
+      await init({ module: `${BASE_URL}${wasmUrl.replace(/^\//, '')}`, sdkUrl: new URL(`${BASE_URL}${sdkUrl.replace(/^\//, '')}`, window.location.origin).href })
       initializeLogger("debug")
       modulePromise = WebAssembly.compileStreaming(
         fetch(WASM_PATH)
