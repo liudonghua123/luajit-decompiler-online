@@ -57,7 +57,7 @@
   background: rgba(0, 0, 0, 0.3);
 }
 
-/* Smooth transitions */
-* {
+/* Smooth transitions for common interactive elements */
+a, button, input, select, textarea {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
