@@ -72,6 +72,21 @@ export function useFileSystem() {
     projectName.value = ''
   }
 
+  async function getFileInfo(fileHandle: FileSystemFileHandle): Promise<{ size: number; encoding: string; modified?: Date; lastModified?: number } | null> {
+    try {
+      const file = await fileHandle.getFile()
+      return {
+        size: file.size,
+        encoding: 'UTF-8',
+        modified: file.lastModified ? new Date(file.lastModified) : undefined,
+        lastModified: file.lastModified
+      }
+    } catch (e) {
+      console.error('Failed to get file info:', e)
+      return null
+    }
+  }
+
   return {
     rootHandle,
     fileTree,
@@ -80,6 +95,7 @@ export function useFileSystem() {
     selectFolder,
     handleDrop,
     readFile,
-    clearProject
+    clearProject,
+    getFileInfo
   }
 }
